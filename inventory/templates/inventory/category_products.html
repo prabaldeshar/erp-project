@@ -1,7 +1,7 @@
 {% extends "inventory/index.html" %}
 
 {% block content %}
-
+<h1>Category: {{category.name}}</h1>
 {% for product in products %}
 <div class="row">
     <div class="col-md-12">
@@ -10,10 +10,9 @@
             <div class="col-md-4" style="width: 18rm;">
                 <div class="card">
                     <h5 class="card-header">
-                        <a href="{% url 'product_detail' product.id %}">
-                            {{product.id}}
+                    <a href="{% url 'product_detail' product.id %}">
                     {{product.name}}
-                </a>
+                    </a>
                     </h5>
                     <div class="card-body">
                         <p class="card-text">
