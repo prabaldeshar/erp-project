@@ -1,8 +1,8 @@
 from django import forms
-from .models import ProductCategory
+from django.forms import ModelForm
+from .models import ProductCategory, Product
 
-class ProductForm(forms.Form):
-    name = forms.CharField(label="Product name", max_length=100)
-    cost_price = forms.IntegerField(label="Cost Price")
-    sales_price = forms.IntegerField(label="Sales Price")
-    category = forms.ModelChoiceField(queryset=ProductCategory.objects.all())
+class ProductForm(ModelForm):
+    class Meta:
+        model = Product
+        fields = '__all__'
