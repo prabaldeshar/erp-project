@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
-from .forms import ProductForm
+from .forms import ProductForm, ProductCategoryForm
 from .models import Product,ProductCategory
 from django.views.generic import View
 from rest_framework.decorators import api_view
@@ -31,8 +31,20 @@ def get_all_products(request):
     return render(request, 'inventory/all_products.html', {'products': products})
 
 def get_all_catgories(request):
-    categories = ProductCategory.objects.all()
-    return render(request, 'inventory/all_categories.html', {'categories': categories})
+    categories = ProductCategory.objects.all() 
+    parent_list = []
+    for category in categories:
+        if category.parent == None:
+            parent_list.append('None')
+        else:
+            parent_list.append(ProductCategory.objects.get(id=category.parent).name)
+    
+
+    zipped = zip(categories, parent_list)
+    context = {
+        'zipped': zipped
+    }
+    return render(request, 'inventory/all_categories.html', context)
 
 def get_category_products(request, category_id):
     # products = Product.objects.filter(category=category)
@@ -58,6 +70,27 @@ def detailView(request, product_id):
     serializer = ProductSerializer(product, many=False)
     return Response(serializer.data)
 
+@api_view(['POST'])
+def createView(request):
+    serializer = ProductSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+    return Response(serializer.data)
+
+class AddProductCategoryView(View):
+    def get(self, request):
+        form = ProductCategoryForm()
+        context = {'form': form}
+        return render(request, 'inventory/category_form.html', context)
+    
+    def post(self, request):
+        form = ProductCategoryForm(request.POST or None)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect('/inventory/')
+
+        context = {'form' : form}
+        return render(request, 'inventory/category_form.html', context)
 
 
 
